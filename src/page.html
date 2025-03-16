@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Daydream to ADB Controls</title>
+    </head>
+    <body>
+        <h1>Daydream to ADB Controls</h1>
+        <button id="button">CONNECT</button><span id="message"></span><br /><br />
+        <script src="daydream.js"></script>
+        <script>
+
+            const button = document.getElementById('button');
+            const message = document.getElementById('message');
+            let socket = null;
+            let PrevState = {
+                TouchClick: null,
+                TouchX: 0,
+                TouchY: 0
+            };
+
+            if ('bluetooth' in navigator == false) {
+                button.style.display = 'none';
+                message.innerHTML = 'Consiguete un adaptador bluetooth o activalo.';
+            }
+
+            function ConnectWebSocket(){
+                if (socket && (socket.readyState === WebSocket.CONNECTING || socket.readyState === WebSocket.OPEN)) {
+                    return;
+                };
+                socket = new WebSocket("ws://localhost:7777");
+
+                socket.onopen = function(){
+                    message.innerHTML = "WebSocket connected"
+                };
+
+                socket.onclose = function(){
+                    message.innerHTML("WebSocket disconnected")
+                    setTimeout(connectWebSocket, 2000);
+                }
+
+                socket.onerror = function(error){
+                    console.error("WebSocket error:", error);
+                    message.innerHTML = "WebSocket error";
+                }
+
+            }
+
+
+
+            button.addEventListener('click', function () {
+
+                ConnectWebSocket();
+                message.innerHTML = "Connecting to Daydream controller..."
+
+                var controller = new DaydreamController();
+                controller.onStateChange(function (state) {
+
+                    const data = {
+                        TouchClick: state.isClickDown,
+                        TouchX: state.xTouch,
+                        TouchY: state.yTouch
+                    };
+
+                    if(data.TouchClick !== PrevState.TouchClick || currentState.TouchX !== prevState.TouchX || currentState.TouchY !== prevState.TouchY){
+                        
+                        if(socket && socket.readyState === WebSocket.OPEN){
+                            socket.send(JSON.stringify(data));
+                            prevState = {...data};
+                        }
+
+                    } 
+
+
+                });
+                controller.connect();
+            });
+        </script>
+    </body>
+</html>
