@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "ws": "^8.18.1"
+  },
+  "name": "daydream-to-adb-test",
+  "version": "1.0.0",
+  "main": "ADBhandler.js",
+  "devDependencies": {},
+  "scripts": {
+    "start-server": "node ./src/ADBhandler.js",
+    "open-html": "start ./src/page.html",
+    "dev": "npm run open-html & npm run start-server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
